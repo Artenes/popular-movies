@@ -1,33 +1,29 @@
-package com.artenesnogueira.popularmovies.tasks;
+package com.artenesnogueira.popularmovies.views;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import com.artenesnogueira.popularmovies.models.Movie;
-import com.artenesnogueira.popularmovies.repositories.MoviesRepository;
-import com.artenesnogueira.popularmovies.R;
-import com.artenesnogueira.popularmovies.repositories.TheMovieDBRepository;
 import com.artenesnogueira.popularmovies.models.Filter;
-import com.artenesnogueira.popularmovies.network.TheMovieDBServer;
-import com.artenesnogueira.popularmovies.views.PostersView;
+import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MoviesRepository;
+import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
+import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
+import com.artenesnogueira.popularmovies.models.PostersView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
- * Load some movies from TheMovieDB repository
+ * Load some movies from a repository
  */
-public class TheMovieDBLoadMoviesTask extends AsyncTask<Filter, Void, List<Movie>> {
+public class LoadMoviesTask extends AsyncTask<Filter, Void, List<Movie>> {
 
     private final MoviesRepository mRepository;
     private final WeakReference<PostersView> mViewReference; //have to be a weak reference in case of an Activity
 
-    public TheMovieDBLoadMoviesTask(Context context, PostersView view) {
-        String posterSize = context.getString(R.string.THEMOVIEDBAPI_POSTER_THUMBNAIL_SIZE);
-        String backdropSize = context.getString(R.string.THEMOVIEDBAPI_BACKDROP_SIZE);
-        mRepository = new TheMovieDBRepository(new TheMovieDBServer(), posterSize, backdropSize);
+    public LoadMoviesTask(MoviesRepository repository, PostersView view) {
+        mRepository = repository;
         mViewReference = new WeakReference<>(view);
     }
 

@@ -11,13 +11,13 @@ public class Movie implements Parcelable {
 
     private final long voteAverage;
     private final String title;
-    private final Image poster;
+    private final String poster;
     private final String originalTitle;
-    private final Image backdrop;
+    private final String backdrop;
     private final String overview;
     private final String releaseDate;
 
-    public Movie(long voteAverage, String title, Image poster, String originalTitle, Image backdrop, String overview, String releaseDate) {
+    public Movie(long voteAverage, String title, String poster, String originalTitle, String backdrop, String overview, String releaseDate) {
         this.voteAverage = voteAverage;
         this.title = title;
         this.poster = poster;
@@ -35,7 +35,7 @@ public class Movie implements Parcelable {
         return title;
     }
 
-    public Image getPoster() {
+    public String getPoster() {
         return poster;
     }
 
@@ -43,7 +43,7 @@ public class Movie implements Parcelable {
         return originalTitle;
     }
 
-    public Image getBackdrop() {
+    public String getBackdrop() {
         return backdrop;
     }
 
@@ -58,9 +58,9 @@ public class Movie implements Parcelable {
     private Movie(Parcel in) {
         voteAverage = in.readLong();
         title = in.readString();
-        poster = in.readParcelable(Image.class.getClassLoader());
+        poster = in.readString();
         originalTitle = in.readString();
-        backdrop = in.readParcelable(Image.class.getClassLoader());
+        backdrop = in.readString();
         overview = in.readString();
         releaseDate = in.readString();
     }
@@ -86,9 +86,9 @@ public class Movie implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(voteAverage);
         dest.writeString(title);
-        dest.writeParcelable(poster, flags);
+        dest.writeString(poster);
         dest.writeString(originalTitle);
-        dest.writeParcelable(poster, flags);
+        dest.writeString(backdrop);
         dest.writeString(overview);
         dest.writeString(releaseDate);
     }

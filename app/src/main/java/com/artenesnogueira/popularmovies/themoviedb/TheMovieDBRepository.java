@@ -1,27 +1,24 @@
-package com.artenesnogueira.popularmovies.network;
+package com.artenesnogueira.popularmovies.themoviedb;
 
 import android.net.Uri;
 
 import com.artenesnogueira.popularmovies.BuildConfig;
 import com.artenesnogueira.popularmovies.models.Filter;
+import com.artenesnogueira.popularmovies.models.HTTPClient;
+import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MoviesRepository;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * The Movie DB Server implementation to get movie data
+ * A repository to fetch movies from The Movie DB service
  */
-public class TheMovieDBServer implements MoviesServer {
-
-    private static final String TAG = TheMovieDBServer.class.getSimpleName();
-
-    //the field in the json response that contains the movie list
-    public static final String RESULTS_FIELD = "results";
+public class TheMovieDBRepository implements MoviesRepository {
 
     //the base uri to make requests with the api key already appended for convenience
     private static final Uri BASE_URI = Uri.parse("https://api.themoviedb.org/3/movie?api_key=" + BuildConfig.POPULAR_MOVIES_THE_MOVIE_DB_API_KEY);
@@ -31,14 +28,29 @@ public class TheMovieDBServer implements MoviesServer {
     //see static code below for initialization
     private static final Map<Filter, String> filterMapping = new HashMap<>();
 
+    private HTTPClient client;
+
+    public TheMovieDBRepository(HTTPClient client) {
+        this.client = client;
+    }
+
     @Override
-    public JSONObject getMovies(Filter filter) throws IOException, JSONException {
+    public List<Movie> getMoviesByFilter(Filter filter) throws IOException {
+
         //first we have to get an URL from an URI
         Uri uri = BASE_URI.buildUpon().appendPath(filterMapping.get(filter)).build();
-        URL popularURL = new URL(uri.toString());
         //then we can make the request to get the json response
-        String rawJSONResponse = NetworkUtils.getResponseFromHttpUrlWithLog(TAG, popularURL);
-        return new JSONObject(rawJSONResponse);
+        String rawJSONResponse = client.get(uri.toString());
+
+        MovieResponse response;
+        try {
+            response = MovieResponse.parse(rawJSONResponse);
+        } catch (JSONException exception) {
+            throw new IOException("Error while parsing the response");
+        }
+
+        return response.getResults();
+
     }
 
     static {

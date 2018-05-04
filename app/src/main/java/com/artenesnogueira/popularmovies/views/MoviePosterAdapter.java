@@ -1,4 +1,4 @@
-package com.artenesnogueira.popularmovies.adapters;
+package com.artenesnogueira.popularmovies.views;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.artenesnogueira.popularmovies.R;
-import com.artenesnogueira.popularmovies.models.Image;
 import com.artenesnogueira.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
@@ -20,21 +19,10 @@ import java.util.List;
  */
 public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.MoviePosterViewHolder> {
 
-    private final int posterWidth;
-    private final int posterHeight;
-
-    /**
-     * Creates a new instance of the class. The sizes are necessary to define a fixed size to all
-     * posters so they can be resized to fit the whole screen properly. If each image had its own
-     * size, this will not be possible.
-     *
-     * @param posterWidth  the width to resize the posters to
-     * @param posterHeight the height to resize the posters to
-     */
-    public MoviePosterAdapter(int posterWidth, int posterHeight) {
-        this.posterWidth = posterWidth;
-        this.posterHeight = posterHeight;
-    }
+    //all the thumbnails must be resized to the same size
+    //so all of them are distributed even in the screen
+    private static final int DEFAULT_THUMBNAIL_WIDTH = 185;
+    private static final int DEFAULT_THUMBNAIL_HEIGHT = 278;
 
     private List<Movie> movies = new ArrayList<>(0);
 
@@ -58,10 +46,9 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
     @Override
     public void onBindViewHolder(@NonNull MoviePosterViewHolder holder, int position) {
         //the only thing we have to do is load the poster
-        Image poster = movies.get(position).getPoster();
         Picasso.get()
-                .load(poster.getPath())
-                .resize(posterWidth, posterHeight)
+                .load(movies.get(position).getPoster())
+                .resize(DEFAULT_THUMBNAIL_WIDTH, DEFAULT_THUMBNAIL_HEIGHT)
                 .placeholder(R.drawable.loading_poster)
                 .error(R.drawable.broken_poster)
                 .into(holder.posterImageView);
