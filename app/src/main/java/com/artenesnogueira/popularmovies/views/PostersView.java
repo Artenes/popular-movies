@@ -1,0 +1,20 @@
+package com.artenesnogueira.popularmovies.views;
+
+import com.artenesnogueira.popularmovies.models.Movie;
+
+import java.util.List;
+
+public interface PostersView {
+
+    String KEY_MOVIES_LIST = "movies_list";
+    String KEY_CURRENT_LIST_POSITION = "current_list_position";
+
+    void showLoading();
+
+    void stopLoading();
+
+    void showMovies(List<Movie> movies);
+
+    void showError();
+
+}

@@ -1,6 +1,7 @@
-package com.artenesnogueira.popularmovies;
+package com.artenesnogueira.popularmovies.utilities;
 
-import android.net.Uri;
+import com.artenesnogueira.popularmovies.models.Image;
+import com.artenesnogueira.popularmovies.models.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,10 +13,7 @@ import java.util.List;
 /**
  * Parser to convert JSONObjects to Movies objects
  */
-class TheMovieDBParser {
-
-    private static final Uri THUMBNAIL_IMAGE_PATH = Uri.parse("http://image.tmdb.org/t/p/w185");
-    private static final Uri LARGE_IMAGE_PATH = Uri.parse("http://image.tmdb.org/t/p/w780");
+public class TheMovieDBParser {
 
     private static final String VOTE_AVERAGE_FIELD = "vote_average";
     private static final String TITLE_FIELD = "title";
@@ -30,25 +28,20 @@ class TheMovieDBParser {
      *
      * @param rawMovie the json object with the movie information
      * @return the Movie instance
-     * @throws JSONException if the rawMovie does not have some of the parsed fields
+     * @throws JSONException            if the rawMovie does not have some of the parsed fields
+     * @throws IllegalArgumentException if the given image sizes are invalid
      */
-    private static Movie parseMovie(JSONObject rawMovie) throws JSONException {
+    private static Movie parseMovie(JSONObject rawMovie, String posterThumbnailSize, String backDropSize) throws JSONException, IllegalArgumentException {
 
-        //this removes the first slash that appears in the relative path
-        //if we left this here we will not be able to properly build the
-        //uri to the image, the uri class will encode the slash in the path
-        String thumbnailRelativePath = rawMovie.getString(POSTER_PATH_FIELD).replaceFirst("/", "");
-        String backdropRelativePath = rawMovie.getString(BACKDROP_PATH_FIELD).replaceFirst("/", "");
-
-        String posterThumbnailURL = THUMBNAIL_IMAGE_PATH.buildUpon().appendPath(thumbnailRelativePath).build().toString();
-        String backdropLargeURL = LARGE_IMAGE_PATH.buildUpon().appendPath(backdropRelativePath).build().toString();
+        Image posterThumbnail = TheMovieDBImageFactory.make(rawMovie.getString(POSTER_PATH_FIELD), posterThumbnailSize);
+        Image backdropLarge = TheMovieDBImageFactory.make(rawMovie.getString(BACKDROP_PATH_FIELD), backDropSize);
 
         return new Movie(
                 rawMovie.getLong(VOTE_AVERAGE_FIELD),
                 rawMovie.getString(TITLE_FIELD),
-                posterThumbnailURL,
+                posterThumbnail,
                 rawMovie.getString(ORIGINAL_TITLE_FIELD),
-                backdropLargeURL,
+                backdropLarge,
                 rawMovie.getString(OVERVIEW_FIELD),
                 rawMovie.getString(RELEASE_DATE_FIELD)
         );
@@ -60,14 +53,15 @@ class TheMovieDBParser {
      *
      * @param movies the array of movies in a json array object
      * @return a list with Movie instances
-     * @throws JSONException if the rawMovie does not have some of the parsed fields
+     * @throws JSONException            if the rawMovie does not have some of the parsed fields
+     * @throws IllegalArgumentException if the given image sizes are invalid
      */
-    public static List<Movie> parseMoviesList(JSONArray movies) throws JSONException {
+    public static List<Movie> parseMoviesList(JSONArray movies, String posterThumbnailSize, String backDropSize) throws JSONException, IllegalArgumentException {
         List<Movie> topRatedMovies = new ArrayList<>(0);
         JSONObject rawMovie;
         for (int index = 0; index < movies.length(); index++) {
             rawMovie = movies.getJSONObject(index);
-            topRatedMovies.add(TheMovieDBParser.parseMovie(rawMovie));
+            topRatedMovies.add(TheMovieDBParser.parseMovie(rawMovie, posterThumbnailSize, backDropSize));
         }
         return topRatedMovies;
     }

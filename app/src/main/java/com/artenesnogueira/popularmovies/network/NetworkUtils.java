@@ -1,4 +1,4 @@
-package com.artenesnogueira.popularmovies;
+package com.artenesnogueira.popularmovies.network;
 
 import android.util.Log;
 
