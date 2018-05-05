@@ -5,6 +5,10 @@
     <string name="try_again">Try again</string>
     <string name="movie_poster_content_description">A movie poster</string>
 
+    <string name="popular_movies">Popular movies</string>
+    <string name="top_rated_movies">Top rated movies</string>
+    <string name="filter">Filter</string>
+
     <!-- Size for images being loaded from TheMovieDB API -->
     <!-- If you change this size, don`t forget to change the sizes in numbers.xml -->
     <!-- There we set a fixed sized for some images to be displayed properly -->
