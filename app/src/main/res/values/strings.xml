@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Popular Movies</string>
     <string name="generic_error_message">Oops, something went wrong</string>
     <string name="loading_awesome_movies">Loading awesome movies</string>
     <string name="try_again">Try again</string>
@@ -8,11 +7,5 @@
     <string name="popular_movies">Popular movies</string>
     <string name="top_rated_movies">Top rated movies</string>
     <string name="filter">Filter</string>
-
-    <!-- Size for images being loaded from TheMovieDB API -->
-    <!-- If you change this size, don`t forget to change the sizes in numbers.xml -->
-    <!-- There we set a fixed sized for some images to be displayed properly -->
-    <string name="THEMOVIEDBAPI_POSTER_THUMBNAIL_SIZE">w185</string>
-    <string name="THEMOVIEDBAPI_BACKDROP_SIZE">w780</string>
 
 </resources>

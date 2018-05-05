@@ -1,4 +1,4 @@
-package com.artenesnogueira.popularmovies.repositories;
+package com.artenesnogueira.popularmovies.models;
 
 import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.Movie;

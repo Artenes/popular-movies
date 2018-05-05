@@ -8,17 +8,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artenesnogueira.popularmovies.R;
-import com.artenesnogueira.popularmovies.adapters.MoviePosterAdapter;
 import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.Movie;
-import com.artenesnogueira.popularmovies.tasks.TheMovieDBLoadMoviesTask;
-import com.artenesnogueira.popularmovies.utilities.EmptyMenuItem;
+import com.artenesnogueira.popularmovies.models.MoviesRepository;
+import com.artenesnogueira.popularmovies.models.PostersView;
+import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
+import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +35,16 @@ public class MainActivity extends AppCompatActivity implements PostersView {
     private LinearLayout mErrorMessage;
     private TextView mLoadingMessageTextView;
     private ProgressBar mLoadingProgressBarr;
-    private Button mTryAgainButton;
 
     //these variables are used to keep the state of the UI
     private List<Movie> mCurrentMovieList = new ArrayList<>(0);
     private int mCurrentListPosition = 0;
     private Filter mCurrentFilter = Filter.POPULAR;
-    private MenuItem mFilterMenuItem = new EmptyMenuItem();
+    private MenuItem mFilterMenuItem;
     private Bundle mPreviousState = new Bundle();
+
+    //the repository containing the movies to load
+    private MoviesRepository mRepository = new TheMovieDBRepository(new HTTPURLConnectionClient());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,21 +57,12 @@ public class MainActivity extends AppCompatActivity implements PostersView {
         mErrorMessage = findViewById(R.id.tv_error_message);
         mLoadingMessageTextView = findViewById(R.id.tv_loading_message);
         mLoadingProgressBarr = findViewById(R.id.pb_loading);
-        mTryAgainButton = findViewById(R.id.bt_try_again);
-        mTryAgainButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reload(mCurrentFilter);
-            }
-        });
+        findViewById(R.id.bt_try_again).setOnClickListener(view -> reload(mCurrentFilter));
 
-        //the adapter needs these sizes to properly layout the images in the grid
-        //we have put this in a resource file so it can be possible to dynamically
-        //change these values base on device resolution, size, orientation, etc
-        int posterWidth = getResources().getInteger(R.integer.POSTER_THUMBNAIL_WIDTH);
-        int posterHeight = getResources().getInteger(R.integer.POSTER_THUMBNAIL_HEIGHT);
-        mMovieAdapter = new MoviePosterAdapter(posterWidth, posterHeight);
+        mMovieAdapter = new MoviePosterAdapter();
 
+        //we use an integer resource for this so it can be
+        //changed dynamically depending on screen orientation
         mGridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.AMOUNT_OF_COLUMNS_IN_POSTER_GRID));
 
         mMoviesPostersRecyclerView.setAdapter(mMovieAdapter);
@@ -133,8 +126,8 @@ public class MainActivity extends AppCompatActivity implements PostersView {
         mLoadingMessageTextView.setVisibility(View.INVISIBLE);
     }
 
-    public void reload(Filter filter) {
-        new TheMovieDBLoadMoviesTask(this, this).execute(filter);
+    private void reload(Filter filter) {
+        new LoadMoviesTask(mRepository, this).execute(filter);
     }
 
     @Override
@@ -161,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements PostersView {
         //decides if it needs to load something or not
         //we start the load task here so the menu item that controls the filter
         //can be instantiated and we don`t get any race condition between the task and the view
-        new TheMovieDBLoadMoviesTask(this, this).restoreStateAndExecute(mPreviousState);
+        new LoadMoviesTask(mRepository, this).restoreStateAndExecute(mPreviousState);
         return true;
     }
 

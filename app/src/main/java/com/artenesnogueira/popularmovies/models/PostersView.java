@@ -1,6 +1,4 @@
-package com.artenesnogueira.popularmovies.views;
-
-import com.artenesnogueira.popularmovies.models.Movie;
+package com.artenesnogueira.popularmovies.models;
 
 import java.util.List;
 
