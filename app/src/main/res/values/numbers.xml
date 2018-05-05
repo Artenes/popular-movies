@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="AMOUNT_OF_COLUMNS_IN_POSTER_GRID">2</integer>
+</resources>
