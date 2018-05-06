@@ -1,7 +1,6 @@
 package com.artenesnogueira.popularmovies.views;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,17 +15,17 @@ import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.Movie;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
+import com.artenesnogueira.popularmovies.models.PosterViewState;
 import com.artenesnogueira.popularmovies.models.PostersView;
 import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
 import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Main Activity of the application, displays a grid of movies posters
  */
 public class MainActivity extends AppCompatActivity implements PostersView, MoviePosterAdapter.OnPosterClicked {
+
+    private static final String KEY_STATE = "state";
 
     private RecyclerView mMoviesPostersRecyclerView;
     private MoviePosterAdapter mMovieAdapter;
@@ -36,12 +35,7 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     private TextView mLoadingMessageTextView;
     private ProgressBar mLoadingProgressBarr;
 
-    //these variables are used to keep the state of the UI
-    private List<Movie> mCurrentMovieList = new ArrayList<>(0);
-    private int mCurrentListPosition = 0;
-    private Filter mCurrentFilter = Filter.POPULAR;
-    private MenuItem mFilterMenuItem;
-    private Bundle mPreviousState = new Bundle();
+    private PosterViewState mCurrentState;
 
     //the repository containing the movies to load
     private final MoviesRepository mRepository = new TheMovieDBRepository(new HTTPURLConnectionClient());
@@ -51,13 +45,11 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPreviousState = savedInstanceState;
-
         mMoviesPostersRecyclerView = findViewById(R.id.rv_movies_list);
         mErrorMessage = findViewById(R.id.tv_error_message);
         mLoadingMessageTextView = findViewById(R.id.tv_loading_message);
         mLoadingProgressBarr = findViewById(R.id.pb_loading);
-        findViewById(R.id.bt_try_again).setOnClickListener(view -> reload(mCurrentFilter));
+        findViewById(R.id.bt_try_again).setOnClickListener(view -> reload());
 
         mMovieAdapter = new MoviePosterAdapter(this);
 
@@ -68,66 +60,57 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
         mMoviesPostersRecyclerView.setAdapter(mMovieAdapter);
         mMoviesPostersRecyclerView.setLayoutManager(mGridLayoutManager);
 
-        //restores the grid layout manager to its previous position
-        if (savedInstanceState != null && savedInstanceState.get(KEY_CURRENT_LIST_POSITION) != null) {
-            mCurrentListPosition = savedInstanceState.getInt(KEY_CURRENT_LIST_POSITION);
+        //if there is no saved state, this is the first time this is being opened
+        //so load the default filter for movies
+        if (savedInstanceState == null) {
+            render(PosterViewState.makeLoadingState(Filter.POPULAR));
         }
-
-        //restores the previous filter selected
-        if (savedInstanceState != null && savedInstanceState.get(KEY_CURRENT_FILTER) != null) {
-            mCurrentFilter = (Filter) savedInstanceState.getSerializable(KEY_CURRENT_FILTER);
-        }
-
     }
 
     @Override
-    public void showLoading() {
-        mCurrentListPosition = 0;
-        mFilterMenuItem.setVisible(false);
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.get(KEY_STATE) != null) {
+            mCurrentState = savedInstanceState.getParcelable(KEY_STATE);
+        }
+
+        render(mCurrentState);
+
+    }
+
+    private void showLoading() {
         mMoviesPostersRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessage.setVisibility(View.INVISIBLE);
         mLoadingProgressBarr.setVisibility(View.VISIBLE);
         mLoadingMessageTextView.setVisibility(View.VISIBLE);
+        invalidateOptionsMenu();
     }
 
-    @Override
-    public void stopLoading() {
-        mLoadingProgressBarr.setVisibility(View.INVISIBLE);
-        mLoadingMessageTextView.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void showMovies(List<Movie> movies) {
-        //we will keep a reference to this list
-        //so we can restore it in configuration changes
-        mCurrentMovieList = movies;
-
-        mFilterMenuItem.setVisible(true);
-
-        mMovieAdapter.setData(movies);
-        mGridLayoutManager.scrollToPosition(mCurrentListPosition);
-
-        mMoviesPostersRecyclerView.setVisibility(View.VISIBLE);
-        mErrorMessage.setVisibility(View.INVISIBLE);
-
-        if (mCurrentFilter == Filter.TOP_RATED) {
-            setTitle(R.string.top_rated_movies);
-        } else {
-            setTitle(R.string.popular_movies);
-        }
-    }
-
-    @Override
-    public void showError() {
-        mFilterMenuItem.setVisible(false);
+    private void showError() {
         mMoviesPostersRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessage.setVisibility(View.VISIBLE);
         mLoadingProgressBarr.setVisibility(View.INVISIBLE);
         mLoadingMessageTextView.setVisibility(View.INVISIBLE);
     }
 
-    private void reload(Filter filter) {
-        new LoadMoviesTask(mRepository, this).execute(filter);
+    private void showMovies() {
+        mLoadingProgressBarr.setVisibility(View.INVISIBLE);
+        mLoadingMessageTextView.setVisibility(View.INVISIBLE);
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mMoviesPostersRecyclerView.setVisibility(View.VISIBLE);
+
+        mMovieAdapter.setData(mCurrentState.getMovies());
+        mGridLayoutManager.scrollToPosition(mCurrentState.getListPosition());
+
+        supportInvalidateOptionsMenu();
+        if (mCurrentState.getFilter() == Filter.TOP_RATED) {
+            setTitle(R.string.top_rated_movies);
+        } else {
+            setTitle(R.string.popular_movies);
+        }
+    }
+
+    private void reload() {
+        render(PosterViewState.makeLoadingState(mCurrentState.getFilter()));
     }
 
     @Override
@@ -136,30 +119,15 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        try {
-            //this can possibly trows a ClassCastException since it can be any other kind of list
-            outState.putParcelableArrayList(KEY_MOVIES_LIST, (ArrayList<? extends Parcelable>) mCurrentMovieList);
-            //this line throws nothing. it is inside the try to look more nice than being outside the try block
-            outState.putInt(KEY_CURRENT_LIST_POSITION, mGridLayoutManager.findFirstVisibleItemPosition());
-            outState.putSerializable(KEY_CURRENT_FILTER, mCurrentFilter);
-        } catch (ClassCastException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_activity, menu);
-        mFilterMenuItem = menu.findItem(R.id.action_filter);
+        return true;
+    }
 
-        //we pass the previous state to the task so it can
-        //decides if it needs to load something or not
-        //we start the load task here so the menu item that controls the filter
-        //can be instantiated and we don`t get any race condition between the task and the view
-        new LoadMoviesTask(mRepository, this).restoreStateAndExecute(mPreviousState);
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //if there are movies, there is something to filter, so we show the option to filter
+        menu.findItem(R.id.action_filter).setVisible(mCurrentState.getMovies() != null);
         return true;
     }
 
@@ -167,16 +135,55 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_popular:
-                mCurrentFilter = Filter.POPULAR;
-                break;
+                render(PosterViewState.makeLoadingState(Filter.POPULAR));
+                return true;
             case R.id.action_top_rated:
-                mCurrentFilter = Filter.TOP_RATED;
-                break;
+                render(PosterViewState.makeLoadingState(Filter.TOP_RATED));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-        reload(mCurrentFilter);
-        return true;
+    }
+
+    @Override
+    public void render(PosterViewState state) {
+
+        //this method is the only entry point ot update the UI
+        //since this view has 3 states, it was getting kinda ugly
+        //to only use member variables to control the state
+        //now the state is isolated in a class and the only thing the
+        //view has to worry is to get this state and render on the screen
+        //this idea was borrowed from the MVI pattern
+        //the DetailsActivity does not use this method because it has only 1 state
+        mCurrentState = state;
+
+        if (state.isLoading()) {
+            showLoading();
+            new LoadMoviesTask(mRepository, this).execute(state.getFilter());
+            return;
+        }
+
+        if (state.hasError()) {
+            showError();
+            return;
+        }
+
+        if (state.getMovies() != null) {
+            showMovies();
+            return;
+        }
+
+        //by default show the error state
+        showError();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //get the current grid position and save the new state instance to the bundle
+        PosterViewState state = mCurrentState.moveToPosition(mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
+        outState.putParcelable(KEY_STATE, state);
     }
 
 }

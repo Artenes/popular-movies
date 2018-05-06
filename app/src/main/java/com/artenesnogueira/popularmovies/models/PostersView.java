@@ -1,19 +1,14 @@
 package com.artenesnogueira.popularmovies.models;
 
-import java.util.List;
-
+/**
+ * A view that can be rendered base on a state
+ */
 public interface PostersView {
 
-    String KEY_MOVIES_LIST = "movies_list";
-    String KEY_CURRENT_LIST_POSITION = "current_list_position";
-    String KEY_CURRENT_FILTER = "current_filter";
-
-    void showLoading();
-
-    void stopLoading();
-
-    void showMovies(List<Movie> movies);
-
-    void showError();
+    /**
+     * Render the current view base on the given state
+     * @param state the state to render
+     */
+    void render(PosterViewState state);
 
 }

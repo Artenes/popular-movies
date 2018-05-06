@@ -85,7 +85,7 @@ public class DetailsActivity extends AppCompatActivity {
         //load the backdrop image
         Picasso.get().load(mMovie.getBackdrop()).into(mBackdropImageView);
 
-        //load the release date\
+        //load the release date
         mReleaseDateTextView.setText(mMovie.getReleaseDate());
 
         //load the plot/overview
@@ -93,7 +93,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         //calculates the rating. The rating goes from 0 to 10, but
         //we want to show in a 5 start rating bar, so we have to
-        //calculate how many start is the rating worth
+        //calculate how many stars is the rating worth
         mUserVoteRatingBar.setRating((mMovie.getVoteAverage() * 5) / 10);
 
         //load the poster image

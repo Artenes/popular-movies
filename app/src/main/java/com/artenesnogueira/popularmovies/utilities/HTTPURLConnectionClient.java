@@ -13,9 +13,13 @@ import java.util.Scanner;
  */
 public class HTTPURLConnectionClient implements HTTPClient {
 
+    //timeout in 5 seconds
+    private static final int TIMEOUT = 5000;
+
     @Override
     public String get(String url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
+        urlConnection.setConnectTimeout(TIMEOUT);
         try {
             InputStream in = urlConnection.getInputStream();
 
