@@ -3,9 +3,14 @@
     <string name="loading_awesome_movies">Loading awesome movies</string>
     <string name="try_again">Try again</string>
     <string name="movie_poster_content_description">A movie poster</string>
+    <string name="movie_backdrop_content_description">A shot from the movie</string>
 
     <string name="popular_movies">Popular movies</string>
     <string name="top_rated_movies">Top rated movies</string>
     <string name="filter">Filter</string>
+    <string name="title_activity_details">DetailsActivity</string>
+
+    <string name="users_rating">Users\' rating</string>
+    <string name="release_date">Release date</string>
 
 </resources>

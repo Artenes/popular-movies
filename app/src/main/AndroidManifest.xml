@@ -3,16 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.artenesnogueira.popularmovies">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/popular_movies"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".views.MainActivity">
             <intent-filter>
@@ -20,6 +20,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".views.DetailsActivity"
+            android:label="@string/title_activity_details"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.artenesnogueira.popularmovies.views.MainActivity" />
         </activity>
     </application>
 

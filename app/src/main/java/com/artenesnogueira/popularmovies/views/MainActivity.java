@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Main Activity of the application, displays a grid of movies posters
  */
-public class MainActivity extends AppCompatActivity implements PostersView {
+public class MainActivity extends AppCompatActivity implements PostersView, MoviePosterAdapter.OnPosterClicked {
 
     private RecyclerView mMoviesPostersRecyclerView;
     private MoviePosterAdapter mMovieAdapter;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements PostersView {
     private Bundle mPreviousState = new Bundle();
 
     //the repository containing the movies to load
-    private MoviesRepository mRepository = new TheMovieDBRepository(new HTTPURLConnectionClient());
+    private final MoviesRepository mRepository = new TheMovieDBRepository(new HTTPURLConnectionClient());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements PostersView {
         mLoadingProgressBarr = findViewById(R.id.pb_loading);
         findViewById(R.id.bt_try_again).setOnClickListener(view -> reload(mCurrentFilter));
 
-        mMovieAdapter = new MoviePosterAdapter();
+        mMovieAdapter = new MoviePosterAdapter(this);
 
         //we use an integer resource for this so it can be
         //changed dynamically depending on screen orientation
@@ -128,6 +128,11 @@ public class MainActivity extends AppCompatActivity implements PostersView {
 
     private void reload(Filter filter) {
         new LoadMoviesTask(mRepository, this).execute(filter);
+    }
+
+    @Override
+    public void onPosterClicked(Movie movie) {
+        DetailsActivity.start(this, movie);
     }
 
     @Override

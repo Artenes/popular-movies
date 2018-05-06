@@ -25,6 +25,11 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
     private static final int DEFAULT_THUMBNAIL_HEIGHT = 278;
 
     private List<Movie> movies = new ArrayList<>(0);
+    private final OnPosterClicked posterClickedCallback;
+
+    public MoviePosterAdapter(OnPosterClicked posterClickedCallback) {
+        this.posterClickedCallback = posterClickedCallback;
+    }
 
     /**
      * Set the new data set and notify the adapter of the changes
@@ -60,15 +65,30 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
     }
 
     /**
+     * Interface for when an item is clicked
+     */
+    public interface OnPosterClicked {
+
+        void onPosterClicked(Movie movie);
+
+    }
+
+    /**
      * The view holder for this adapter
      */
-    class MoviePosterViewHolder extends RecyclerView.ViewHolder {
+    class MoviePosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         final ImageView posterImageView;
 
         MoviePosterViewHolder(View itemView) {
             super(itemView);
             posterImageView = itemView.findViewById(R.id.iv_movie_poster);
+            posterImageView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            posterClickedCallback.onPosterClicked(movies.get(getAdapterPosition()));
         }
 
     }

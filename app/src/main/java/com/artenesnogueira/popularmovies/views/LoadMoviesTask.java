@@ -6,8 +6,6 @@ import android.os.Bundle;
 import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.Movie;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
-import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
-import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
 import com.artenesnogueira.popularmovies.models.PostersView;
 
 import java.io.IOException;
@@ -17,12 +15,12 @@ import java.util.List;
 /**
  * Load some movies from a repository
  */
-public class LoadMoviesTask extends AsyncTask<Filter, Void, List<Movie>> {
+class LoadMoviesTask extends AsyncTask<Filter, Void, List<Movie>> {
 
     private final MoviesRepository mRepository;
     private final WeakReference<PostersView> mViewReference; //have to be a weak reference in case of an Activity
 
-    public LoadMoviesTask(MoviesRepository repository, PostersView view) {
+    LoadMoviesTask(MoviesRepository repository, PostersView view) {
         mRepository = repository;
         mViewReference = new WeakReference<>(view);
     }
