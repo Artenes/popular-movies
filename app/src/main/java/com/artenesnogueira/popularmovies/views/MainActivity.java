@@ -4,16 +4,18 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.Filter;
-import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MoviePoster;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
 import com.artenesnogueira.popularmovies.models.PosterViewState;
 import com.artenesnogueira.popularmovies.models.PostersView;
@@ -24,6 +26,8 @@ import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
  * Main Activity of the application, displays a grid of movies posters
  */
 public class MainActivity extends AppCompatActivity implements PostersView, MoviePosterAdapter.OnPosterClicked {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final String KEY_STATE = "state";
 
@@ -114,8 +118,10 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     }
 
     @Override
-    public void onPosterClicked(Movie movie) {
-        DetailsActivity.start(this, movie);
+    public void onPosterClicked(MoviePoster movie) {
+        //TODO: refactor DetailsActivity to load the movie data when it is opened
+        //DetailsActivity.start(this, movie);
+        Toast.makeText(this, movie.getId() + " clicked", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -182,7 +188,9 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //get the current grid position and save the new state instance to the bundle
-        PosterViewState state = mCurrentState.moveToPosition(mGridLayoutManager.findFirstCompletelyVisibleItemPosition());
+        int itemPosition = mGridLayoutManager.findFirstCompletelyVisibleItemPosition();
+        Log.i(TAG, "Position saved at : " + itemPosition);
+        PosterViewState state = mCurrentState.moveToPosition(itemPosition);
         outState.putParcelable(KEY_STATE, state);
     }
 

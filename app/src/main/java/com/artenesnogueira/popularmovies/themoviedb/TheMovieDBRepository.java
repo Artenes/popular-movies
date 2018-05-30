@@ -6,6 +6,7 @@ import com.artenesnogueira.popularmovies.BuildConfig;
 import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.HTTPClient;
 import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MoviePoster;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
 
 import org.json.JSONException;
@@ -35,6 +36,26 @@ public class TheMovieDBRepository implements MoviesRepository {
     }
 
     @Override
+    public List<MoviePoster> getMoviesPostersByFilter(Filter filter) throws IOException {
+
+        //first we have to get an URL from an URI
+        Uri uri = BASE_URI.buildUpon().appendPath(filterMapping.get(filter)).build();
+
+        //then we can make the request to get the json response
+        String rawJSONResponse = client.get(uri.toString());
+
+        List<MoviePoster> posters;
+        try {
+            posters = MoviePosterParser.parse(rawJSONResponse);
+        } catch (JSONException exception) {
+            throw new IOException("Error while parsing the response");
+        }
+
+        return posters;
+
+    }
+
+    @Override
     public List<Movie> getMoviesByFilter(Filter filter) throws IOException {
 
         //first we have to get an URL from an URI
@@ -42,14 +63,14 @@ public class TheMovieDBRepository implements MoviesRepository {
         //then we can make the request to get the json response
         String rawJSONResponse = client.get(uri.toString());
 
-        MovieResponse response;
+        List<Movie> movies;
         try {
-            response = MovieResponse.parse(rawJSONResponse);
+            movies = MoviesParser.parse(rawJSONResponse);
         } catch (JSONException exception) {
             throw new IOException("Error while parsing the response");
         }
 
-        return response.getResults();
+        return movies;
 
     }
 

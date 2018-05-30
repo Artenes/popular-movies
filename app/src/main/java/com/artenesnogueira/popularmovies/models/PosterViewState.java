@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class PosterViewState implements Parcelable {
 
-    private final List<Movie> movies;
+    private final List<MoviePoster> movies;
     private final int listPosition;
     private final Filter filter;
     private final boolean loading;
@@ -24,11 +24,11 @@ public class PosterViewState implements Parcelable {
         return new PosterViewState(null, 0, filter, false, true);
     }
 
-    public static PosterViewState makeViewMoviesState(List<Movie> movies, Filter filter) {
+    public static PosterViewState makeViewMoviesState(List<MoviePoster> movies, Filter filter) {
         return new PosterViewState(movies, 0, filter, false, false);
     }
 
-    public List<Movie> getMovies() {
+    public List<MoviePoster> getMovies() {
         return movies;
     }
 
@@ -52,7 +52,7 @@ public class PosterViewState implements Parcelable {
         return new PosterViewState(movies, position, filter, loading, hasError);
     }
 
-    private PosterViewState(List<Movie> movies, int listPosition, Filter filter, boolean loading, boolean hasError) {
+    private PosterViewState(List<MoviePoster> movies, int listPosition, Filter filter, boolean loading, boolean hasError) {
         this.movies = movies;
         this.listPosition = listPosition;
         this.filter = filter;
@@ -63,7 +63,7 @@ public class PosterViewState implements Parcelable {
     //Methods to implement the Parcelable interface
 
     private PosterViewState(Parcel in) {
-        movies = in.createTypedArrayList(Movie.CREATOR);
+        movies = in.createTypedArrayList(MoviePoster.CREATOR);
         listPosition = in.readInt();
         loading = in.readByte() != 0;
         hasError = in.readByte() != 0;

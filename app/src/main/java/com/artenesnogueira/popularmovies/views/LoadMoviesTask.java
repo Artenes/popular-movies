@@ -3,7 +3,7 @@ package com.artenesnogueira.popularmovies.views;
 import android.os.AsyncTask;
 
 import com.artenesnogueira.popularmovies.models.Filter;
-import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MoviePoster;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
 import com.artenesnogueira.popularmovies.models.PosterViewState;
 import com.artenesnogueira.popularmovies.models.PostersView;
@@ -33,11 +33,10 @@ class LoadMoviesTask extends AsyncTask<Filter, Void, PosterViewState> {
             filter = filters[0];
         }
         try {
-            List<Movie> movies = mRepository.getMoviesByFilter(filter);
+            List<MoviePoster> movies = mRepository.getMoviesPostersByFilter(filter);
             return PosterViewState.makeViewMoviesState(movies, filter);
         } catch (IOException exception) {
             exception.printStackTrace();
-            //we return null to indicate that something went wrong
             return PosterViewState.makeErrorState(filter);
         }
     }
