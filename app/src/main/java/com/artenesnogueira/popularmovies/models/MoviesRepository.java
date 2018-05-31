@@ -21,6 +21,15 @@ public interface MoviesRepository {
     List<MoviePoster> getMoviesPostersByFilter(Filter filter) throws IOException;
 
     /**
+     * Fetch the details from a movie
+     *
+     * @param id the id of the movie
+     * @return the movie details
+     * @throws IOException in case of error while accessing the repository
+     */
+    Movie getMovieDetails(String id) throws IOException;
+
+    /**
      * Get a list of movies by filter
      *
      * @param filter the filter to fetch the movies

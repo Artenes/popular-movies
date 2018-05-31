@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * The state of the poster view. This is an immutable object.
  */
-public class PosterViewState implements Parcelable {
+public class PosterViewState implements Parcelable, State {
 
     private final List<MoviePoster> movies;
     private final int listPosition;

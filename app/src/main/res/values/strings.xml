@@ -1,6 +1,7 @@
 <resources>
     <string name="generic_error_message">Oops, something went wrong</string>
     <string name="loading_awesome_movies">Loading awesome movies</string>
+    <string name="loading_movie_details">Loading movie details</string>
     <string name="try_again">Try again</string>
     <string name="movie_poster_content_description">A movie poster</string>
     <string name="movie_backdrop_content_description">A shot from the movie</string>

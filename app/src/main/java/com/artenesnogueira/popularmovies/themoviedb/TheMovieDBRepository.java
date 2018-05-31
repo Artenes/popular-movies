@@ -56,6 +56,26 @@ public class TheMovieDBRepository implements MoviesRepository {
     }
 
     @Override
+    public Movie getMovieDetails(String id) throws IOException {
+
+        //first we have to get an URL from an URI
+        Uri uri = BASE_URI.buildUpon().appendPath(id).build();
+
+        //then we can make the request to get the json response
+        String rawJSONResponse = client.get(uri.toString());
+
+        Movie movie;
+        try {
+            movie = MovieDetailParser.parse(rawJSONResponse);
+        } catch (JSONException exception) {
+            throw new IOException("Error while parsing the response");
+        }
+
+        return movie;
+
+    }
+
+    @Override
     public List<Movie> getMoviesByFilter(Filter filter) throws IOException {
 
         //first we have to get an URL from an URI

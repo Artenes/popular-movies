@@ -3,30 +3,37 @@ package com.artenesnogueira.popularmovies.views;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MovieDetailViewState;
+import com.artenesnogueira.popularmovies.models.MoviesRepository;
+import com.artenesnogueira.popularmovies.models.State;
+import com.artenesnogueira.popularmovies.models.View;
+import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
+import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
 import com.squareup.picasso.Picasso;
-
-import java.util.Objects;
 
 /**
  * Activity that displays the details of a movie
  */
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements View {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
+    private static final String KEY_MOVIE_ID = "movie";
+    private static final String KEY_STATE = "state";
 
-    private static final String KEY_MOVIE = "movie";
-    private static final String KEY_Y_SCROLL = "yScroll";
-
-    private Movie mMovie;
+    private MovieDetailViewState mCurrentState;
 
     private CoordinatorLayout mContainerLayout;
     private ImageView mPosterImageView;
@@ -34,12 +41,19 @@ public class DetailsActivity extends AppCompatActivity {
     private RatingBar mUserVoteRatingBar;
     private TextView mReleaseDateTextView;
     private TextView mPlotTextView;
+    private LinearLayout mErrorMessage;
+    private TextView mLoadingMessage;
+    private ProgressBar mLoadingProgressBar;
+    private CollapsingToolbarLayout mTollBar;
+
+    //the repository containing the movies to load
+    private final MoviesRepository mRepository = new TheMovieDBRepository(new HTTPURLConnectionClient());
 
     //a static method is a good way to explicitly tell
     //what we want to start this activity
-    public static void start(Context context, Movie movie) {
+    public static void start(Context context, String id) {
         Intent intent = new Intent(context, DetailsActivity.class);
-        intent.putExtra(KEY_MOVIE, movie);
+        intent.putExtra(KEY_MOVIE_ID, id);
         context.startActivity(intent);
     }
 
@@ -50,13 +64,21 @@ public class DetailsActivity extends AppCompatActivity {
 
         //if there is no movie, there is nothing to do
         Intent intent = getIntent();
-        if (intent == null || !intent.hasExtra(KEY_MOVIE) || intent.getParcelableExtra(KEY_MOVIE) == null) {
-            Log.e(TAG, "No movie passed in intent");
+        if (intent == null || !intent.hasExtra(KEY_MOVIE_ID)) {
+            Log.e(TAG, "No movie id passed in intent");
             finish();
             return;
         }
 
-        mMovie = intent.getParcelableExtra(KEY_MOVIE);
+        String id = intent.getStringExtra(KEY_MOVIE_ID);
+
+        if (id == null || id.isEmpty()) {
+            Log.e(TAG, "No movie id passed in intent");
+            finish();
+            return;
+        }
+
+        mTollBar = findViewById(R.id.toolbar_layout);
 
         setSupportActionBar(findViewById(R.id.toolbar));
         mContainerLayout = findViewById(R.id.cl_container);
@@ -65,40 +87,44 @@ public class DetailsActivity extends AppCompatActivity {
         mUserVoteRatingBar = findViewById(R.id.rb_user_votes);
         mReleaseDateTextView = findViewById(R.id.tv_release_date);
         mPlotTextView = findViewById(R.id.tv_plot);
+        mErrorMessage = findViewById(R.id.tv_error_message);
+        mLoadingMessage = findViewById(R.id.tv_loading_message);
+        mLoadingProgressBar = findViewById(R.id.pb_loading);
+        findViewById(R.id.bt_try_again).setOnClickListener(view -> reload());
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-        bindMovieToUI();
-
-        //restores the scroll of the screen if one is available
-        if (savedInstanceState != null && savedInstanceState.get(KEY_Y_SCROLL) != null) {
-            mContainerLayout.scrollTo(0, savedInstanceState.getInt(KEY_Y_SCROLL));
+        if (savedInstanceState == null) {
+            render(MovieDetailViewState.makeLoadingState(id));
         }
 
     }
 
-    private void bindMovieToUI() {
+    private void bindMovieToUI(Movie movie) {
 
         //load the title
-        Objects.requireNonNull(getSupportActionBar()).setTitle(mMovie.getTitle());
+        mTollBar.setTitle(movie.getTitle());
 
         //load the backdrop image
-        Picasso.get().load(mMovie.getBackdrop()).into(mBackdropImageView);
+        Picasso.get().load(movie.getBackdrop()).into(mBackdropImageView);
 
         //load the release date
-        mReleaseDateTextView.setText(mMovie.getReleaseDate());
+        mReleaseDateTextView.setText(movie.getReleaseDate());
 
         //load the plot/overview
-        mPlotTextView.setText(mMovie.getOverview());
+        mPlotTextView.setText(movie.getOverview());
 
         //calculates the rating. The rating goes from 0 to 10, but
         //we want to show in a 5 start rating bar, so we have to
         //calculate how many stars is the rating worth
-        mUserVoteRatingBar.setRating((mMovie.getVoteAverage() * 5) / 10);
+        mUserVoteRatingBar.setRating((movie.getVoteAverage() * 5) / 10);
 
         //load the poster image
         Picasso.get()
-                .load(mMovie.getPoster())
+                .load(movie.getPoster())
                 .placeholder(R.drawable.loading_poster)
                 .error(R.drawable.broken_poster)
                 .into(mPosterImageView);
@@ -106,10 +132,78 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_STATE)) {
+            mCurrentState = savedInstanceState.getParcelable(KEY_STATE);
+        }
+
+        render(mCurrentState);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        //TODO: fix get scroll Y, always returning zero
         //save the scroll position of the screen
-        outState.putInt(KEY_Y_SCROLL, mContainerLayout.getScrollY());
+        int scroll = mContainerLayout.getScrollY();
+        Log.i(TAG, "Scroll saved at : " + scroll);
+        MovieDetailViewState state = mCurrentState.scrollToPosition(scroll);
+        outState.putParcelable(KEY_STATE, state);
+    }
+
+    private void showLoading() {
+        mContainerLayout.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.INVISIBLE);
+        mLoadingProgressBar.setVisibility(android.view.View.VISIBLE);
+        mLoadingMessage.setVisibility(android.view.View.VISIBLE);
+    }
+
+    private void showError() {
+        mContainerLayout.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.VISIBLE);
+        mLoadingProgressBar.setVisibility(android.view.View.INVISIBLE);
+        mLoadingMessage.setVisibility(android.view.View.INVISIBLE);
+    }
+
+    private void showMovie() {
+        mLoadingMessage.setVisibility(android.view.View.INVISIBLE);
+        mLoadingProgressBar.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.INVISIBLE);
+
+        bindMovieToUI(mCurrentState.getMovie());
+
+        mContainerLayout.setVisibility(android.view.View.VISIBLE);
+        mContainerLayout.scrollTo(0, mCurrentState.getScrollPosition());
+    }
+
+    private void reload() {
+        render(MovieDetailViewState.makeLoadingState(mCurrentState.getMovieId()));
+    }
+
+    @Override
+    public void render(State state) {
+
+        mCurrentState = (MovieDetailViewState) state;
+
+        if (mCurrentState.isLoading()) {
+            showLoading();
+            new LoadMovieDetailTask(mRepository, this).execute(mCurrentState.getMovieId());
+            return;
+        }
+
+        if (mCurrentState.hasError()) {
+            showError();
+            return;
+        }
+
+        if (mCurrentState.getMovie() != null) {
+            showMovie();
+            return;
+        }
+
+        //by default show the error state
+        showError();
+
     }
 
 }

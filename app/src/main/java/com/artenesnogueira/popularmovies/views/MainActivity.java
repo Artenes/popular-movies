@@ -7,25 +7,24 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.MoviePoster;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
 import com.artenesnogueira.popularmovies.models.PosterViewState;
-import com.artenesnogueira.popularmovies.models.PostersView;
+import com.artenesnogueira.popularmovies.models.State;
+import com.artenesnogueira.popularmovies.models.View;
 import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
 import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
 
 /**
  * Main Activity of the application, displays a grid of movies posters
  */
-public class MainActivity extends AppCompatActivity implements PostersView, MoviePosterAdapter.OnPosterClicked {
+public class MainActivity extends AppCompatActivity implements View, MoviePosterAdapter.OnPosterClicked {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -82,25 +81,25 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     }
 
     private void showLoading() {
-        mMoviesPostersRecyclerView.setVisibility(View.INVISIBLE);
-        mErrorMessage.setVisibility(View.INVISIBLE);
-        mLoadingProgressBarr.setVisibility(View.VISIBLE);
-        mLoadingMessageTextView.setVisibility(View.VISIBLE);
+        mMoviesPostersRecyclerView.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.INVISIBLE);
+        mLoadingProgressBarr.setVisibility(android.view.View.VISIBLE);
+        mLoadingMessageTextView.setVisibility(android.view.View.VISIBLE);
         invalidateOptionsMenu();
     }
 
     private void showError() {
-        mMoviesPostersRecyclerView.setVisibility(View.INVISIBLE);
-        mErrorMessage.setVisibility(View.VISIBLE);
-        mLoadingProgressBarr.setVisibility(View.INVISIBLE);
-        mLoadingMessageTextView.setVisibility(View.INVISIBLE);
+        mMoviesPostersRecyclerView.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.VISIBLE);
+        mLoadingProgressBarr.setVisibility(android.view.View.INVISIBLE);
+        mLoadingMessageTextView.setVisibility(android.view.View.INVISIBLE);
     }
 
     private void showMovies() {
-        mLoadingProgressBarr.setVisibility(View.INVISIBLE);
-        mLoadingMessageTextView.setVisibility(View.INVISIBLE);
-        mErrorMessage.setVisibility(View.INVISIBLE);
-        mMoviesPostersRecyclerView.setVisibility(View.VISIBLE);
+        mLoadingProgressBarr.setVisibility(android.view.View.INVISIBLE);
+        mLoadingMessageTextView.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.INVISIBLE);
+        mMoviesPostersRecyclerView.setVisibility(android.view.View.VISIBLE);
 
         mMovieAdapter.setData(mCurrentState.getMovies());
         mGridLayoutManager.scrollToPosition(mCurrentState.getListPosition());
@@ -119,9 +118,7 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
 
     @Override
     public void onPosterClicked(MoviePoster movie) {
-        //TODO: refactor DetailsActivity to load the movie data when it is opened
-        //DetailsActivity.start(this, movie);
-        Toast.makeText(this, movie.getId() + " clicked", Toast.LENGTH_SHORT).show();
+        DetailsActivity.start(this, movie.getId());
     }
 
     @Override
@@ -152,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
     }
 
     @Override
-    public void render(PosterViewState state) {
+    public void render(State state) {
 
         //this method is the only entry point ot update the UI
         //since this view has 3 states, it was getting kinda ugly
@@ -161,20 +158,20 @@ public class MainActivity extends AppCompatActivity implements PostersView, Movi
         //view has to worry is to get this state and render on the screen
         //this idea was borrowed from the MVI pattern
         //the DetailsActivity does not use this method because it has only 1 state
-        mCurrentState = state;
+        mCurrentState = (PosterViewState) state;
 
-        if (state.isLoading()) {
+        if (mCurrentState.isLoading()) {
             showLoading();
-            new LoadMoviesTask(mRepository, this).execute(state.getFilter());
+            new LoadMoviesTask(mRepository, this).execute(mCurrentState.getFilter());
             return;
         }
 
-        if (state.hasError()) {
+        if (mCurrentState.hasError()) {
             showError();
             return;
         }
 
-        if (state.getMovies() != null) {
+        if (mCurrentState.getMovies() != null) {
             showMovies();
             return;
         }
