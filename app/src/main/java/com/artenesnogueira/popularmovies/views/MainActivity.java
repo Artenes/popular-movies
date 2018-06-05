@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
         mErrorMessage.setVisibility(android.view.View.INVISIBLE);
         mLoadingProgressBarr.setVisibility(android.view.View.VISIBLE);
         mLoadingMessageTextView.setVisibility(android.view.View.VISIBLE);
+        mGridLayoutManager.scrollToPosition(0);
         supportInvalidateOptionsMenu();
     }
 
