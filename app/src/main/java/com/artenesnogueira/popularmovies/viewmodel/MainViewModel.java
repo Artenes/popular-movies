@@ -23,7 +23,9 @@ public class MainViewModel extends ViewModel {
 
         //the default state is to start loading the default filter
         //this only happens if we did not have a state previously
-        reload();
+        if (mCurrentState.getValue() == null) {
+            reload();
+        }
 
         return mCurrentState;
 
