@@ -90,6 +90,8 @@ public class DetailsActivity extends AppCompatActivity implements View {
         mErrorMessage = findViewById(R.id.tv_error_message);
         mLoadingMessage = findViewById(R.id.tv_loading_message);
         mLoadingProgressBar = findViewById(R.id.pb_loading);
+        mPosterImageView.setDrawingCacheEnabled(true);
+        mBackdropImageView.setDrawingCacheEnabled(true);
         findViewById(R.id.bt_try_again).setOnClickListener(view -> mViewModel.reload());
 
         ActionBar actionBar = getSupportActionBar();
@@ -197,10 +199,19 @@ public class DetailsActivity extends AppCompatActivity implements View {
         switch (item.getItemId()) {
             case R.id.action_favorite:
                 mViewModel.swapFavorite();
+                mViewModel.cacheImages(mPosterImageView.getDrawingCache(),
+                        mBackdropImageView.getDrawingCache());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPosterImageView.destroyDrawingCache();
+        mBackdropImageView.destroyDrawingCache();
     }
 
 }

@@ -5,7 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-@Database(entities = {FavoriteMovie.class, FavoriteMoviePoster.class}, version = 2)
+@Database(entities = {FavoriteMovie.class, FavoriteMoviePoster.class}, version = 3)
 public abstract class LocalDB extends RoomDatabase{
 
     private static final String DB_NAME = "popularmovies.db";
@@ -13,7 +13,8 @@ public abstract class LocalDB extends RoomDatabase{
 
     public static LocalDB get(Context context) {
         if (instance == null) {
-            instance = Room.databaseBuilder(context, LocalDB.class, DB_NAME).build();
+            instance = Room.databaseBuilder(context, LocalDB.class, DB_NAME)
+                    .fallbackToDestructiveMigration().build();
         }
         return instance;
     }

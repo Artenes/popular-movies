@@ -5,13 +5,21 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import com.artenesnogueira.popularmovies.db.FavoriteMoviePoster;
 import com.artenesnogueira.popularmovies.db.LocalDB;
 import com.artenesnogueira.popularmovies.models.Dependecies;
+import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MovieBitmap;
 import com.artenesnogueira.popularmovies.models.MovieDetailViewState;
 import com.artenesnogueira.popularmovies.views.LoadMovieDetailTask;
+import com.artenesnogueira.popularmovies.views.SaveMovieImagesTask;
 import com.artenesnogueira.popularmovies.views.SwapMovieFavoriteTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ViewModel for DetailsActivity
@@ -19,6 +27,9 @@ import com.artenesnogueira.popularmovies.views.SwapMovieFavoriteTask;
 public class DetailsViewModel extends AndroidViewModel {
 
     private final MutableLiveData<MovieDetailViewState> mCurrentState = new MutableLiveData<>();
+
+    private MovieBitmap cachedPoster;
+    private MovieBitmap cachedBackdrop;
 
     public DetailsViewModel(@NonNull Application application) {
         super(application);
@@ -59,6 +70,33 @@ public class DetailsViewModel extends AndroidViewModel {
 
         new SwapMovieFavoriteTask(LocalDB.get(getApplication()), mCurrentState)
                 .execute(mCurrentState.getValue().getMovie());
+
+    }
+
+    public void cacheImages(Bitmap poster, Bitmap backdrop) {
+
+        if (cachedPoster != cachedBackdrop) {
+            return;
+        }
+
+        Movie movie = mCurrentState.getValue().getMovie();
+
+        if (cachedBackdrop == null) {
+
+            cachedBackdrop = new MovieBitmap(movie.getId(), movie.getBackdrop(),
+                    FavoriteMoviePoster.BACKDROP, backdrop);
+
+        }
+
+        if (cachedPoster == null) {
+
+            cachedPoster = new MovieBitmap(movie.getId(), movie.getPoster(),
+                    FavoriteMoviePoster.POSTER_THUMBNAIL, poster);
+
+        }
+
+        new SaveMovieImagesTask(getApplication(), LocalDB.get(getApplication()))
+                .execute(cachedPoster, cachedBackdrop);
 
     }
 
