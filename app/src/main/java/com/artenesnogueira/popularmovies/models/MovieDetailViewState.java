@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * The state of the movie detail view. This is an immutable object.
  */
-public class MovieDetailViewState implements Parcelable, State {
+public class MovieDetailViewState implements State {
 
     private final String movieId;
     private final Movie movie;
@@ -57,41 +57,5 @@ public class MovieDetailViewState implements Parcelable, State {
         this.loading = loading;
         this.hasError = hasError;
     }
-
-    //Methods to implement the Parcelable interface
-
-    private MovieDetailViewState(Parcel in) {
-        movieId = in.readString();
-        movie = in.readParcelable(Movie.class.getClassLoader());
-        scrollPosition = in.readInt();
-        loading = in.readByte() != 0;
-        hasError = in.readByte() != 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(movieId);
-        dest.writeParcelable(movie, flags);
-        dest.writeInt(scrollPosition);
-        dest.writeByte((byte) (loading ? 1 : 0));
-        dest.writeByte((byte) (hasError ? 1 : 0));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<MovieDetailViewState> CREATOR = new Creator<MovieDetailViewState>() {
-        @Override
-        public MovieDetailViewState createFromParcel(Parcel in) {
-            return new MovieDetailViewState(in);
-        }
-
-        @Override
-        public MovieDetailViewState[] newArray(int size) {
-            return new MovieDetailViewState[size];
-        }
-    };
 
 }

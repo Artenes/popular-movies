@@ -9,6 +9,7 @@
     <string name="popular_movies">Popular movies</string>
     <string name="top_rated_movies">Top rated movies</string>
     <string name="filter">Filter</string>
+    <string name="favorite">Favorite</string>
     <string name="title_activity_details">DetailsActivity</string>
 
     <string name="users_rating">Users\' rating</string>

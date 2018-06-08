@@ -9,11 +9,14 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.Movie;
@@ -30,6 +33,8 @@ public class DetailsActivity extends AppCompatActivity implements View {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
     private static final String KEY_MOVIE_ID = "movie";
+
+    private DetailsViewModel mViewModel;
 
     private CoordinatorLayout mContainerLayout;
     private ImageView mPosterImageView;
@@ -71,7 +76,7 @@ public class DetailsActivity extends AppCompatActivity implements View {
             return;
         }
 
-        DetailsViewModel viewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(DetailsViewModel.class);
 
         mTollBar = findViewById(R.id.toolbar_layout);
 
@@ -85,14 +90,14 @@ public class DetailsActivity extends AppCompatActivity implements View {
         mErrorMessage = findViewById(R.id.tv_error_message);
         mLoadingMessage = findViewById(R.id.tv_loading_message);
         mLoadingProgressBar = findViewById(R.id.pb_loading);
-        findViewById(R.id.bt_try_again).setOnClickListener(view -> viewModel.reload());
+        findViewById(R.id.bt_try_again).setOnClickListener(view -> mViewModel.reload());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        viewModel.watchState(id).observe(this, this::render);
+        mViewModel.watchState(id).observe(this, this::render);
 
     }
 
@@ -146,6 +151,7 @@ public class DetailsActivity extends AppCompatActivity implements View {
         bindMovieToUI(movie);
 
         mContainerLayout.setVisibility(android.view.View.VISIBLE);
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -171,6 +177,30 @@ public class DetailsActivity extends AppCompatActivity implements View {
         //by default show the error state
         showError();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.details_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        int icon = mViewModel.isFavorite() ? R.drawable.ic_is_favorite_24dp : R.drawable.ic_not_favorite_24dp;
+        menu.findItem(R.id.action_favorite).setIcon(icon);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_favorite:
+                mViewModel.swapFavorite();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

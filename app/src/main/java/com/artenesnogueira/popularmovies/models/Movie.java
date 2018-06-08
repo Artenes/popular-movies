@@ -1,14 +1,12 @@
 package com.artenesnogueira.popularmovies.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * An immutable movie object
  */
 @SuppressWarnings("unused")
-public class Movie implements Parcelable {
+public class Movie {
 
+    private final String id;
     private final long voteAverage;
     private final String title;
     private final String poster;
@@ -16,8 +14,10 @@ public class Movie implements Parcelable {
     private final String backdrop;
     private final String overview;
     private final String releaseDate;
+    private final boolean isFavorite;
 
-    public Movie(long voteAverage, String title, String poster, String originalTitle, String backdrop, String overview, String releaseDate) {
+    public Movie(String id, long voteAverage, String title, String poster, String originalTitle, String backdrop, String overview, String releaseDate, boolean isFavorite) {
+        this.id = id;
         this.voteAverage = voteAverage;
         this.title = title;
         this.poster = poster;
@@ -25,6 +25,11 @@ public class Movie implements Parcelable {
         this.backdrop = backdrop;
         this.overview = overview;
         this.releaseDate = releaseDate;
+        this.isFavorite = isFavorite;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public long getVoteAverage() {
@@ -55,42 +60,12 @@ public class Movie implements Parcelable {
         return releaseDate;
     }
 
-    private Movie(Parcel in) {
-        voteAverage = in.readLong();
-        title = in.readString();
-        poster = in.readString();
-        originalTitle = in.readString();
-        backdrop = in.readString();
-        overview = in.readString();
-        releaseDate = in.readString();
+    public boolean isFavorite() {
+        return isFavorite;
     }
 
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(voteAverage);
-        dest.writeString(title);
-        dest.writeString(poster);
-        dest.writeString(originalTitle);
-        dest.writeString(backdrop);
-        dest.writeString(overview);
-        dest.writeString(releaseDate);
+    public Movie setFavorite(boolean isFavorite) {
+        return new Movie(id, voteAverage, title, poster, originalTitle, backdrop, overview, releaseDate, isFavorite);
     }
 
 }

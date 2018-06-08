@@ -40,13 +40,15 @@ class MoviesParser {
 
             //and parse to the movie object
             Movie movie = new Movie(
+                    rawMovie.getString(TheMovieDBContract.ID_FIELD),
                     rawMovie.getLong(TheMovieDBContract.VOTE_AVERAGE_FIELD),
                     rawMovie.getString(TheMovieDBContract.TITLE_FIELD),
                     posterPath,
                     rawMovie.getString(TheMovieDBContract.ORIGINAL_TITLE_FIELD),
                     backdropPath,
                     rawMovie.getString(TheMovieDBContract.OVERVIEW_FIELD),
-                    rawMovie.getString(TheMovieDBContract.RELEASE_DATE_FIELD)
+                    rawMovie.getString(TheMovieDBContract.RELEASE_DATE_FIELD),
+                    false
             );
 
             //finally add in the results list
