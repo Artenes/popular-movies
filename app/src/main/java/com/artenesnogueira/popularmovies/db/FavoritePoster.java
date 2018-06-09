@@ -1,9 +1,9 @@
 package com.artenesnogueira.popularmovies.db;
 
-@SuppressWarnings("unused")
 /**
  * A poster from a favorite movie
  */
+@SuppressWarnings("unused")
 public class FavoritePoster {
 
     public String _id;

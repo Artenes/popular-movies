@@ -1,8 +1,5 @@
 package com.artenesnogueira.popularmovies.models;
 
-import android.content.Context;
-
-import com.artenesnogueira.popularmovies.db.LocalDB;
 import com.artenesnogueira.popularmovies.themoviedb.TheMovieDBRepository;
 import com.artenesnogueira.popularmovies.utilities.HTTPURLConnectionClient;
 

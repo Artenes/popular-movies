@@ -48,7 +48,9 @@ class MoviesParser {
                     backdropPath,
                     rawMovie.getString(TheMovieDBContract.OVERVIEW_FIELD),
                     rawMovie.getString(TheMovieDBContract.RELEASE_DATE_FIELD),
-                    false
+                    false,
+                    new ArrayList<>(0),
+                    new ArrayList<>(0)
             );
 
             //finally add in the results list

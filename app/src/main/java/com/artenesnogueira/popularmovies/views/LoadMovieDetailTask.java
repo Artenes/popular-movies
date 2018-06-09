@@ -11,6 +11,7 @@ import com.artenesnogueira.popularmovies.models.MovieDetailViewState;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -83,7 +84,7 @@ public class LoadMovieDetailTask extends AsyncTask<String, Void, MovieDetailView
         //a local movie will always be a favorite movie
         return new Movie(localMovie._id, localMovie.rating, localMovie.title,
                 poster, localMovie.title, backdrop, localMovie.synopsis,
-                localMovie.release_date, true);
+                localMovie.release_date, true, new ArrayList<>(0), new ArrayList<>(0));
 
     }
 }

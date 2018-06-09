@@ -17,4 +17,11 @@
     <string name="users_rating">Users\' rating</string>
     <string name="release_date">Release date</string>
 
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+
+    <string name="trailer_count">Trailer #%1$d</string>
+
+    <string name="trailer_content_description">A movie trailer</string>
+
 </resources>

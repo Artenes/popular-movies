@@ -7,7 +7,9 @@ import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.HTTPClient;
 import com.artenesnogueira.popularmovies.models.Movie;
 import com.artenesnogueira.popularmovies.models.MoviePoster;
+import com.artenesnogueira.popularmovies.models.MovieReview;
 import com.artenesnogueira.popularmovies.models.MoviesRepository;
+import com.artenesnogueira.popularmovies.models.YoutubeVideo;
 
 import org.json.JSONException;
 
@@ -59,14 +61,22 @@ public class TheMovieDBRepository implements MoviesRepository {
     public Movie getMovieDetails(String id) throws IOException {
 
         //first we have to get an URL from an URI
-        Uri uri = BASE_URI.buildUpon().appendPath(id).build();
+        Uri detailsUri = TheMovieDBContract.getMovieDetailsUri(id);
+        Uri videosUri = TheMovieDBContract.getMovieVideosUri(id);
+        Uri reviewsUri = TheMovieDBContract.getMovieReviewsUri(id);
 
         //then we can make the request to get the json response
-        String rawJSONResponse = client.get(uri.toString());
+        String rawMovieDetails = client.get(detailsUri.toString());
+        String rawVideos = client.get(videosUri.toString());
+        String rawReviews = client.get(reviewsUri.toString());
 
         Movie movie;
         try {
-            movie = MovieDetailParser.parse(rawJSONResponse);
+
+            List<YoutubeVideo> videos = MovieVideosParser.parseList(rawVideos);
+            List<MovieReview> reviews = MovieReviewsParser.parseList(rawReviews);
+            movie = MovieDetailParser.parse(rawMovieDetails, videos, reviews);
+
         } catch (JSONException exception) {
             throw new IOException("Error while parsing the response");
         }

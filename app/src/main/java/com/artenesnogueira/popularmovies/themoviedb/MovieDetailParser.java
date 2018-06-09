@@ -1,16 +1,20 @@
 package com.artenesnogueira.popularmovies.themoviedb;
 
 import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MovieReview;
+import com.artenesnogueira.popularmovies.models.YoutubeVideo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Parser that creates a Movie from a raw json response
  */
 class MovieDetailParser {
 
-    public static Movie parse(String rawJsonResponse) throws JSONException {
+    public static Movie parse(String rawJsonResponse, List<YoutubeVideo> videos, List<MovieReview> reviews) throws JSONException {
 
         //create the json object from the string
         JSONObject rawMovie = new JSONObject(rawJsonResponse);
@@ -33,7 +37,9 @@ class MovieDetailParser {
                 backdropPath,
                 rawMovie.getString(TheMovieDBContract.OVERVIEW_FIELD),
                 rawMovie.getString(TheMovieDBContract.RELEASE_DATE_FIELD),
-                false
+                false,
+                videos,
+                reviews
         );
 
     }

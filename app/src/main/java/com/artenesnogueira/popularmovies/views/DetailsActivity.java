@@ -1,13 +1,17 @@
 package com.artenesnogueira.popularmovies.views;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,13 +26,14 @@ import com.artenesnogueira.popularmovies.models.Movie;
 import com.artenesnogueira.popularmovies.models.MovieDetailViewState;
 import com.artenesnogueira.popularmovies.models.State;
 import com.artenesnogueira.popularmovies.models.View;
+import com.artenesnogueira.popularmovies.models.YoutubeVideo;
 import com.artenesnogueira.popularmovies.viewmodel.DetailsViewModel;
 import com.squareup.picasso.Picasso;
 
 /**
  * Activity that displays the details of a movie
  */
-public class DetailsActivity extends AppCompatActivity implements View {
+public class DetailsActivity extends AppCompatActivity implements View, YoutubeVideosAdapter.OnVideoClicked {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
     private static final String KEY_MOVIE_ID = "movie";
@@ -42,9 +47,14 @@ public class DetailsActivity extends AppCompatActivity implements View {
     private TextView mReleaseDateTextView;
     private TextView mPlotTextView;
     private LinearLayout mErrorMessage;
+    private LinearLayout mTrailersLayout;
+    private LinearLayout mReviewsLayout;
     private TextView mLoadingMessage;
     private ProgressBar mLoadingProgressBar;
     private CollapsingToolbarLayout mTollBar;
+
+    private YoutubeVideosAdapter mTrailersAdapter;
+    private ReviewsAdapter mReviewsAdapter;
 
     //a static method is a good way to explicitly tell
     //what we want to start this activity
@@ -90,6 +100,24 @@ public class DetailsActivity extends AppCompatActivity implements View {
         mLoadingMessage = findViewById(R.id.tv_loading_message);
         mLoadingProgressBar = findViewById(R.id.pb_loading);
 
+        mTrailersLayout = findViewById(R.id.videos_view);
+        mReviewsLayout = findViewById(R.id.reviews_view);
+
+        RecyclerView trailersRecyclerView = findViewById(R.id.rv_trailers);
+        RecyclerView reviewsRecyclerView = findViewById(R.id.rv_reviews);
+
+        mTrailersAdapter = new YoutubeVideosAdapter(this, this);
+        mReviewsAdapter = new ReviewsAdapter();
+
+        trailersRecyclerView.setHasFixedSize(true);
+        trailersRecyclerView.setLayoutManager(new LinearLayoutManager(this,
+                LinearLayoutManager.HORIZONTAL, false));
+        trailersRecyclerView.setAdapter(mTrailersAdapter);
+
+        reviewsRecyclerView.setHasFixedSize(true);
+        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        reviewsRecyclerView.setAdapter(mReviewsAdapter);
+
         //enable drawing cache so we can get its bitmap later to cache if necessary
         mPosterImageView.setDrawingCacheEnabled(true);
         mBackdropImageView.setDrawingCacheEnabled(true);
@@ -130,6 +158,20 @@ public class DetailsActivity extends AppCompatActivity implements View {
                 .placeholder(R.drawable.loading_poster)
                 .error(R.drawable.broken_poster)
                 .into(mPosterImageView);
+
+        if (movie.getVideos().size() > 0) {
+            mTrailersLayout.setVisibility(android.view.View.VISIBLE);
+            mTrailersAdapter.setData(movie.getVideos());
+        } else {
+            mTrailersLayout.setVisibility(android.view.View.INVISIBLE);
+        }
+
+        if (movie.getReviews().size() > 0) {
+            mReviewsLayout.setVisibility(android.view.View.VISIBLE);
+            mReviewsAdapter.setData(movie.getReviews());
+        } else {
+            mReviewsLayout.setVisibility(android.view.View.INVISIBLE);
+        }
 
     }
 
@@ -217,6 +259,19 @@ public class DetailsActivity extends AppCompatActivity implements View {
         //destroy the cache for the image views
         mPosterImageView.destroyDrawingCache();
         mBackdropImageView.destroyDrawingCache();
+    }
+
+    @Override
+    public void onVideoClicked(YoutubeVideo video) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + video.getId()));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(video.getUrl()));
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException exception) {
+            //in case the user does not have the youtube app installed
+            //we launch the web browser or any other app that can handle the action view intent
+            startActivity(webIntent);
+        }
     }
 
 }
