@@ -4,6 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+@SuppressWarnings({"WeakerAccess", "CanBeFinal", "NullableProblems", "unused"})
 @Entity(tableName = "favorite_movie_posters")
 public class FavoriteMoviePoster {
 

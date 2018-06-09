@@ -6,10 +6,8 @@ import java.util.List;
 /**
  * A repository that hold movies
  */
+@SuppressWarnings("unused")
 public interface MoviesRepository {
-
-    //helper member to define witch filter to use by default
-    Filter DEFAULT_FILTER = Filter.POPULAR;
 
     /**
      * Get a list of movie posters by filter

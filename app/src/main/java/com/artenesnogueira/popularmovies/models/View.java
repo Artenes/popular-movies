@@ -3,6 +3,7 @@ package com.artenesnogueira.popularmovies.models;
 /**
  * A view that can be rendered base on a state
  */
+@SuppressWarnings("unused")
 public interface View {
 
     /**
