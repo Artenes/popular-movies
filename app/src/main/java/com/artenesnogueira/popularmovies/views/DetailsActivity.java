@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.Movie;
@@ -90,8 +89,11 @@ public class DetailsActivity extends AppCompatActivity implements View {
         mErrorMessage = findViewById(R.id.tv_error_message);
         mLoadingMessage = findViewById(R.id.tv_loading_message);
         mLoadingProgressBar = findViewById(R.id.pb_loading);
+
+        //enable drawing cache so we can get its bitmap later to cache if necessary
         mPosterImageView.setDrawingCacheEnabled(true);
         mBackdropImageView.setDrawingCacheEnabled(true);
+
         findViewById(R.id.bt_try_again).setOnClickListener(view -> mViewModel.reload());
 
         ActionBar actionBar = getSupportActionBar();
@@ -199,6 +201,8 @@ public class DetailsActivity extends AppCompatActivity implements View {
         switch (item.getItemId()) {
             case R.id.action_favorite:
                 mViewModel.swapFavorite();
+                //cache the images already loaded in the image views
+                //so we don`t need to download them again
                 mViewModel.cacheImages(mPosterImageView.getDrawingCache(),
                         mBackdropImageView.getDrawingCache());
                 return true;
@@ -210,6 +214,7 @@ public class DetailsActivity extends AppCompatActivity implements View {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //destroy the cache for the image views
         mPosterImageView.destroyDrawingCache();
         mBackdropImageView.destroyDrawingCache();
     }

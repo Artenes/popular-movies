@@ -1,8 +1,5 @@
 package com.artenesnogueira.popularmovies.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * The state of the movie detail view. This is an immutable object.
  */
@@ -10,20 +7,19 @@ public class MovieDetailViewState implements State {
 
     private final String movieId;
     private final Movie movie;
-    private final int scrollPosition;
     private final boolean loading;
     private final boolean hasError;
 
     public static MovieDetailViewState makeLoadingState(String id) {
-        return new MovieDetailViewState(id, null, 0, true, false);
+        return new MovieDetailViewState(id, null, true, false);
     }
 
     public static MovieDetailViewState makeErrorState(String id) {
-        return new MovieDetailViewState(id, null, 0, false, true);
+        return new MovieDetailViewState(id, null, false, true);
     }
 
     public static MovieDetailViewState makeViewMovieState(Movie movie, String id) {
-        return new MovieDetailViewState(id, movie, 0, false, false);
+        return new MovieDetailViewState(id, movie, false, false);
     }
 
     public String getMovieId() {
@@ -34,10 +30,6 @@ public class MovieDetailViewState implements State {
         return movie;
     }
 
-    public int getScrollPosition() {
-        return scrollPosition;
-    }
-
     public boolean isLoading() {
         return loading;
     }
@@ -46,14 +38,9 @@ public class MovieDetailViewState implements State {
         return hasError;
     }
 
-    public MovieDetailViewState scrollToPosition(int position) {
-        return new MovieDetailViewState(movieId, movie, position, loading, hasError);
-    }
-
-    private MovieDetailViewState(String movieId, Movie movie, int scrollPosition, boolean loading, boolean hasError) {
+    private MovieDetailViewState(String movieId, Movie movie, boolean loading, boolean hasError) {
         this.movieId = movieId;
         this.movie = movie;
-        this.scrollPosition = scrollPosition;
         this.loading = loading;
         this.hasError = hasError;
     }

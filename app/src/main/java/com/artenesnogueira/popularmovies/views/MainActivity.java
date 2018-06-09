@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artenesnogueira.popularmovies.R;
-import com.artenesnogueira.popularmovies.models.Filter;
 import com.artenesnogueira.popularmovies.models.MoviePoster;
 import com.artenesnogueira.popularmovies.models.PosterViewState;
 import com.artenesnogueira.popularmovies.models.State;
@@ -32,10 +31,10 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
 
     private LinearLayout mErrorMessage;
     private TextView mLoadingMessageTextView;
+    private TextView mEmptyMessageTextView;
     private ProgressBar mLoadingProgressBarr;
 
     private MainViewModel mMainViewModel;
-    private boolean showFilterAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
 
         mMoviesPostersRecyclerView = findViewById(R.id.rv_movies_list);
         mErrorMessage = findViewById(R.id.tv_error_message);
+        mEmptyMessageTextView = findViewById(R.id.tv_empty);
         mLoadingMessageTextView = findViewById(R.id.tv_loading_message);
         mLoadingProgressBarr = findViewById(R.id.pb_loading);
         findViewById(R.id.bt_try_again).setOnClickListener(view -> mMainViewModel.reload());
@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
         mErrorMessage.setVisibility(android.view.View.INVISIBLE);
         mLoadingProgressBarr.setVisibility(android.view.View.VISIBLE);
         mLoadingMessageTextView.setVisibility(android.view.View.VISIBLE);
+        mEmptyMessageTextView.setVisibility(android.view.View.INVISIBLE);
         mGridLayoutManager.scrollToPosition(0);
-        supportInvalidateOptionsMenu();
     }
 
     private void showError() {
@@ -79,23 +79,25 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
         mErrorMessage.setVisibility(android.view.View.VISIBLE);
         mLoadingProgressBarr.setVisibility(android.view.View.INVISIBLE);
         mLoadingMessageTextView.setVisibility(android.view.View.INVISIBLE);
-        supportInvalidateOptionsMenu();
+        mEmptyMessageTextView.setVisibility(android.view.View.INVISIBLE);
     }
 
-    private void showMovies(Filter filter, List<MoviePoster> movies) {
+    private void showEmpty() {
+        mMoviesPostersRecyclerView.setVisibility(android.view.View.INVISIBLE);
+        mErrorMessage.setVisibility(android.view.View.INVISIBLE);
+        mLoadingProgressBarr.setVisibility(android.view.View.INVISIBLE);
+        mLoadingMessageTextView.setVisibility(android.view.View.INVISIBLE);
+        mEmptyMessageTextView.setVisibility(android.view.View.VISIBLE);
+    }
+
+    private void showMovies(List<MoviePoster> movies) {
         mLoadingProgressBarr.setVisibility(android.view.View.INVISIBLE);
         mLoadingMessageTextView.setVisibility(android.view.View.INVISIBLE);
         mErrorMessage.setVisibility(android.view.View.INVISIBLE);
         mMoviesPostersRecyclerView.setVisibility(android.view.View.VISIBLE);
+        mEmptyMessageTextView.setVisibility(android.view.View.INVISIBLE);
 
         mMovieAdapter.setData(movies);
-
-        supportInvalidateOptionsMenu();
-        if (filter == Filter.TOP_RATED) {
-            setTitle(R.string.top_rated_movies);
-        } else {
-            setTitle(R.string.popular_movies);
-        }
     }
 
     @Override
@@ -110,20 +112,19 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        //if there are movies, there is something to filter, so we show the option to filter
-        menu.findItem(R.id.action_filter).setVisible(showFilterAction);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_popular:
                 mMainViewModel.loadPopular();
+                setTitle(R.string.popular_movies);
                 return true;
             case R.id.action_top_rated:
                 mMainViewModel.loadTopRated();
+                setTitle(R.string.top_rated_movies);
+                return true;
+            case R.id.action_favorite_movies:
+                mMainViewModel.loadFavorites();
+                setTitle(R.string.favorite_movies);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -142,10 +143,6 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
         //the DetailsActivity does not use this method because it has only 1 state
         PosterViewState currentSate = (PosterViewState) state;
 
-        //this has to be done outside the other ifs so it
-        //can have its value updated in any state change
-        showFilterAction = currentSate.getMovies() != null;
-
         if (currentSate.isLoading()) {
             showLoading();
             return;
@@ -157,7 +154,13 @@ public class MainActivity extends AppCompatActivity implements View, MoviePoster
         }
 
         if (currentSate.getMovies() != null) {
-            showMovies(currentSate.getFilter(), currentSate.getMovies());
+
+            if (currentSate.getMovies().size() == 0) {
+                showEmpty();
+                return;
+            }
+
+            showMovies(currentSate.getMovies());
             return;
         }
 

@@ -1,13 +1,10 @@
 package com.artenesnogueira.popularmovies.views;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 
-import com.artenesnogueira.popularmovies.BuildConfig;
 import com.artenesnogueira.popularmovies.db.FavoriteMoviePoster;
 import com.artenesnogueira.popularmovies.db.FavoriteMoviePosterDAO;
 import com.artenesnogueira.popularmovies.db.LocalDB;
@@ -23,6 +20,7 @@ import java.lang.ref.WeakReference;
  *
  * Needs to pass the movie instance for the execute method
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class SaveMovieImagesTask extends AsyncTask<MovieBitmap, Void, Void> {
 
     private static final String TAG = SaveMovieImagesTask.class.getSimpleName();
@@ -39,6 +37,7 @@ public class SaveMovieImagesTask extends AsyncTask<MovieBitmap, Void, Void> {
     protected Void doInBackground(MovieBitmap... bitmaps) {
 
         FavoriteMoviePosterDAO dao = mDb.favoriteMoviePosterDAO();
+        //the root directory is inside the app folder
         File root = getRootDirectory();
 
         if (root == null || !root.exists()) {
@@ -47,6 +46,8 @@ public class SaveMovieImagesTask extends AsyncTask<MovieBitmap, Void, Void> {
 
         for (MovieBitmap bitmap : bitmaps) {
 
+            //replace all slashes with underscores
+            //we want to use the url as the file name
             File file = new File(root, bitmap.getUrl().replace("/", "_"));
 
             if (!file.exists()) {
@@ -63,7 +64,7 @@ public class SaveMovieImagesTask extends AsyncTask<MovieBitmap, Void, Void> {
 
                     dao.insert(new FavoriteMoviePoster(
                             bitmap.getMovieId(),
-                            file.getAbsolutePath(),
+                            "file://" + file.getAbsolutePath(),
                             bitmap.getType()));
 
                 } catch (IOException exception) {
@@ -78,6 +79,11 @@ public class SaveMovieImagesTask extends AsyncTask<MovieBitmap, Void, Void> {
 
     }
 
+    /**
+     * The root directory to save images
+     *
+     * @return the path to the directory
+     */
     private File getRootDirectory() {
 
         Context context = mContextReference.get();

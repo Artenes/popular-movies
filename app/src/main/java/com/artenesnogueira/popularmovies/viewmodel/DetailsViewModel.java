@@ -4,13 +4,12 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.artenesnogueira.popularmovies.db.FavoriteMoviePoster;
 import com.artenesnogueira.popularmovies.db.LocalDB;
-import com.artenesnogueira.popularmovies.models.Dependecies;
+import com.artenesnogueira.popularmovies.models.Dependencies;
 import com.artenesnogueira.popularmovies.models.Movie;
 import com.artenesnogueira.popularmovies.models.MovieBitmap;
 import com.artenesnogueira.popularmovies.models.MovieDetailViewState;
@@ -18,12 +17,10 @@ import com.artenesnogueira.popularmovies.views.LoadMovieDetailTask;
 import com.artenesnogueira.popularmovies.views.SaveMovieImagesTask;
 import com.artenesnogueira.popularmovies.views.SwapMovieFavoriteTask;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * ViewModel for DetailsActivity
  */
+@SuppressWarnings("ConstantConditions")
 public class DetailsViewModel extends AndroidViewModel {
 
     private final MutableLiveData<MovieDetailViewState> mCurrentState = new MutableLiveData<>();
@@ -58,11 +55,7 @@ public class DetailsViewModel extends AndroidViewModel {
 
     public boolean isFavorite() {
 
-        if (mCurrentState.getValue().getMovie() == null) {
-            return false;
-        }
-
-        return mCurrentState.getValue().getMovie().isFavorite();
+        return mCurrentState.getValue().getMovie() != null && mCurrentState.getValue().getMovie().isFavorite();
 
     }
 
@@ -110,7 +103,7 @@ public class DetailsViewModel extends AndroidViewModel {
         mCurrentState.setValue(MovieDetailViewState.makeLoadingState(id));
 
         new LoadMovieDetailTask(
-                Dependecies.getRepository(),
+                Dependencies.getRepository(),
                 LocalDB.get(getApplication()),
                 mCurrentState).execute(id);
 
