@@ -235,6 +235,7 @@ public class DetailsActivity extends AppCompatActivity implements View, YoutubeV
     public boolean onPrepareOptionsMenu(Menu menu) {
         int icon = mViewModel.isFavorite() ? R.drawable.ic_is_favorite_24dp : R.drawable.ic_not_favorite_24dp;
         menu.findItem(R.id.action_favorite).setIcon(icon);
+        menu.findItem(R.id.action_share).setVisible(mViewModel.hasTrailers());
         return true;
     }
 
@@ -248,6 +249,8 @@ public class DetailsActivity extends AppCompatActivity implements View, YoutubeV
                 mViewModel.cacheImages(mPosterImageView.getDrawingCache(),
                         mBackdropImageView.getDrawingCache());
                 return true;
+            case R.id.action_share:
+                mViewModel.shareFirstTrailer();
             default:
                 return super.onOptionsItemSelected(item);
         }

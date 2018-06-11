@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
@@ -13,9 +14,12 @@ import com.artenesnogueira.popularmovies.models.Dependencies;
 import com.artenesnogueira.popularmovies.models.Movie;
 import com.artenesnogueira.popularmovies.models.MovieBitmap;
 import com.artenesnogueira.popularmovies.models.MovieDetailViewState;
+import com.artenesnogueira.popularmovies.models.YoutubeVideo;
 import com.artenesnogueira.popularmovies.views.LoadMovieDetailTask;
 import com.artenesnogueira.popularmovies.views.SaveMovieImagesTask;
 import com.artenesnogueira.popularmovies.views.SwapMovieFavoriteTask;
+
+import java.util.List;
 
 /**
  * ViewModel for DetailsActivity
@@ -59,6 +63,31 @@ public class DetailsViewModel extends AndroidViewModel {
 
     }
 
+    public boolean hasTrailers() {
+
+        Movie movie = mCurrentState.getValue().getMovie();
+
+        return movie != null && movie.getVideos().size() > 0;
+
+    }
+
+    public void shareFirstTrailer() {
+
+        List<YoutubeVideo> trailers = mCurrentState.getValue().getMovie().getVideos();
+
+        if (trailers.size() == 0) {
+            return;
+        }
+
+        YoutubeVideo firstTrailer = trailers.get(0);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, firstTrailer.getUrl());
+        sendIntent.setType("text/plain");
+        getApplication().startActivity(sendIntent);
+
+    }
+
     public void swapFavorite() {
 
         new SwapMovieFavoriteTask(LocalDB.get(getApplication()), mCurrentState)
@@ -94,7 +123,7 @@ public class DetailsViewModel extends AndroidViewModel {
     }
 
     /**
-     *  Load a movie by the given id
+     * Load a movie by the given id
      *
      * @param id the movie`s id
      */
