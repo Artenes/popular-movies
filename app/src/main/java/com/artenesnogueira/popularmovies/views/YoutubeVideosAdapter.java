@@ -6,10 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.artenesnogueira.popularmovies.R;
 import com.artenesnogueira.popularmovies.models.YoutubeVideo;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,15 @@ public class YoutubeVideosAdapter extends RecyclerView.Adapter<YoutubeVideosAdap
 
     @Override
     public void onBindViewHolder(@NonNull YoutubeVideoViewHolder holder, int position) {
+
+        YoutubeVideo youtubeVideo = videos.get(position);
+
+        if (youtubeVideo == null) {
+            return;
+        }
+
         holder.countTextView.setText(context.getString(R.string.trailer_count, (position + 1)));
+        Picasso.get().load(youtubeVideo.getThumbnailUrl()).into(holder.thumbnailImageView);
     }
 
     @Override
@@ -69,11 +79,13 @@ public class YoutubeVideosAdapter extends RecyclerView.Adapter<YoutubeVideosAdap
      */
     class YoutubeVideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        final ImageView thumbnailImageView;
         final TextView countTextView;
 
         YoutubeVideoViewHolder(View itemView) {
             super(itemView);
             countTextView = itemView.findViewById(R.id.tv_trailer_count);
+            thumbnailImageView = itemView.findViewById(R.id.iv_thumbnail);
             itemView.setOnClickListener(this);
         }
 

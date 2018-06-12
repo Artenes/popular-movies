@@ -32,4 +32,8 @@ public class YoutubeVideo {
         return "https://www.youtube.com/watch?v=" + getId();
     }
 
+    public String getThumbnailUrl() {
+        return "http://img.youtube.com/vi/"+getId()+"/sddefault.jpg";
+    }
+
 }
