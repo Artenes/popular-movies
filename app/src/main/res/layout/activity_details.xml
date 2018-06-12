@@ -47,6 +47,12 @@
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/movie_backdrop_content_description"/>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/black"
+                    android:alpha="0.3"/>
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
