@@ -1,0 +1,63 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "a2bbe63b76e027143db9d45f18477607",
+    "entities": [
+      {
+        "tableName": "favorite_movies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `title` TEXT NOT NULL, `synopsis` TEXT NOT NULL, `rating` INTEGER NOT NULL, `release_date` TEXT NOT NULL, `poster_path` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "synopsis",
+            "columnName": "synopsis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "release_date",
+            "columnName": "release_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poster_path",
+            "columnName": "poster_path",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a2bbe63b76e027143db9d45f18477607\")"
+    ]
+  }
+}

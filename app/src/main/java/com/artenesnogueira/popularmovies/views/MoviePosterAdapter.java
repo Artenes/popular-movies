@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.artenesnogueira.popularmovies.R;
-import com.artenesnogueira.popularmovies.models.Movie;
+import com.artenesnogueira.popularmovies.models.MoviePoster;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
     private static final int DEFAULT_THUMBNAIL_WIDTH = 185;
     private static final int DEFAULT_THUMBNAIL_HEIGHT = 278;
 
-    private List<Movie> movies = new ArrayList<>(0);
+    private List<MoviePoster> movies = new ArrayList<>(0);
     private final OnPosterClicked posterClickedCallback;
 
     public MoviePosterAdapter(OnPosterClicked posterClickedCallback) {
@@ -36,7 +36,7 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
      *
      * @param movies the new list of movies
      */
-    public void setData(@NonNull List<Movie> movies) {
+    public void setData(@NonNull List<MoviePoster> movies) {
         this.movies = movies;
         notifyDataSetChanged();
     }
@@ -52,7 +52,7 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
     public void onBindViewHolder(@NonNull MoviePosterViewHolder holder, int position) {
         //the only thing we have to do is load the poster
         Picasso.get()
-                .load(movies.get(position).getPoster())
+                .load(movies.get(position).getPosterPath())
                 .resize(DEFAULT_THUMBNAIL_WIDTH, DEFAULT_THUMBNAIL_HEIGHT)
                 .placeholder(R.drawable.loading_poster)
                 .error(R.drawable.broken_poster)
@@ -69,7 +69,7 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
      */
     public interface OnPosterClicked {
 
-        void onPosterClicked(Movie movie);
+        void onPosterClicked(MoviePoster movie);
 
     }
 

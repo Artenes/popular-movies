@@ -19,6 +19,17 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <TextView
+        android:id="@+id/tv_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_movies_found"
+        android:visibility="invisible"
+        android:textSize="16sp"
+        android:fontFamily="monospace"
+        android:layout_gravity="center"
+        android:drawableTop="@drawable/ic_error_outline_black_24dp" />
+
     <LinearLayout
         android:id="@+id/tv_error_message"
         android:layout_width="wrap_content"

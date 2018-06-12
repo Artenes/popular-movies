@@ -6,18 +6,22 @@
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_filter_list_black_24dp"
         android:title="@string/filter"
-        android:visible="false"
         app:showAsAction="ifRoom">
         <menu>
 
             <item
                 android:id="@+id/action_popular"
                 android:title="@string/popular_movies"
-                app:showAsAction="never" />
+                app:showAsAction="never"/>
             <item
                 android:id="@+id/action_top_rated"
                 android:title="@string/top_rated_movies"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/action_favorite_movies"
+                android:title="@string/favorite_movies"
                 app:showAsAction="never" />
+
         </menu>
     </item>
 </menu>

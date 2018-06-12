@@ -1,0 +1,83 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "1ff4bba58fd51f2d74b59fc875cdc90e",
+    "entities": [
+      {
+        "tableName": "favorite_movies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `title` TEXT NOT NULL, `synopsis` TEXT NOT NULL, `rating` INTEGER NOT NULL, `release_date` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "synopsis",
+            "columnName": "synopsis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "release_date",
+            "columnName": "release_date",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "favorite_movie_posters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`movie_id` TEXT NOT NULL, `path` TEXT NOT NULL, PRIMARY KEY(`movie_id`))",
+        "fields": [
+          {
+            "fieldPath": "movie_id",
+            "columnName": "movie_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "movie_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1ff4bba58fd51f2d74b59fc875cdc90e\")"
+    ]
+  }
+}
