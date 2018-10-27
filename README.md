@@ -35,3 +35,7 @@ PopularMovies_TheMovieDbAPIKey="your api key"
 ````
 
 Import the project in Android Studio and run the application
+
+# License
+
+MIT License
